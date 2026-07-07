@@ -350,11 +350,11 @@
     el.style.display = "block";
   }
 
-  // Devuelve el registro de canon más reciente con PAGADA = true
+  // Devuelve el registro de canon más reciente con PAGADA = "S"
   function canonMasReciente(arr) {
     const pagados = arr.filter(r => {
-      const p = r["PAGADA"];
-      return p === true || String(p).toUpperCase() === "TRUE";
+      const p = String(r["PAGADA"] || "").toUpperCase().trim();
+      return p === "S" || p === "SI" || p === "SÍ" || p === "TRUE" || p === "1";
     });
     if (!pagados.length) return null;
     pagados.sort((a, b) => {
@@ -392,25 +392,24 @@
 
     try {
       const [resCat, resCan] = await Promise.all([
-        fetch(`${EP_CATASTRO}?expediente=${encodeURIComponent(nro)}`).then(r => r.json()),
-        fetch(`${EP_CANON}?expediente=${encodeURIComponent(nro)}`).then(r => r.json()),
+        fetch(`${EP_CATASTRO}`).then(r => r.json()),
+        fetch(`${EP_CANON}?numexp=${encodeURIComponent(nro)}`).then(r => r.json()),
       ]);
 
       document.getElementById("spinner").style.display = "none";
 
       // ── Catastro ──
-      const catArr = toArray(resCat);
+      // ── Catastro — filtramos por "N° EXPEDIENTE" del lado cliente ──
+      const catArr = toArray(resCat.datos || resCat);
       const cat = catArr.find(r =>
-        String(r["N° EXPEDIENTE"] || r["N° DE EXPEDIENTE"] || "").trim().toUpperCase() === nro
-      ) || catArr[0];
-
+        String(r["N° EXPEDIENTE"] || "").trim().toUpperCase() === nro
+      );
       if (!cat) { setError("Expediente no encontrado en el catastro."); return; }
 
-      // ── Canon ──
-      const canArr = toArray(resCan);
-      // Filtrar también por expediente si el endpoint devuelve todos
+      // ── Canon — el endpoint ya filtra por numexp, PAGADA viene como "S"/"N" ──
+      const canArr = toArray(resCan.datos || resCan);
       const canExp = canArr.filter(r =>
-        String(r["N° EXPEDIENTE"] || r["EXPEDIENTE"] || "").trim().toUpperCase() === nro
+        String(r["NumExp"] || "").trim().toUpperCase() === nro
       );
       const canon = canonMasReciente(canExp.length ? canExp : canArr);
       if (!canon) { setError("No hay pagos registrados (PAGADA = TRUE) para este expediente."); return; }
