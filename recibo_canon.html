@@ -5,434 +5,298 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Liquidación Canon — Secretaría de Minería · Río Negro</title>
   <style>
-    :root {
-      --rn-blue:  #003366;
-      --stone-50: #fafaf9;
-      --stone-100:#f5f5f4;
-      --stone-200:#e7e5e4;
-      --stone-400:#a8a29e;
-      --stone-600:#57534e;
-      --stone-800:#292524;
-      --stone-900:#1c1917;
-      --red:      #991b1b;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --rn-blue:#003366; --stone-50:#fafaf9; --stone-100:#f5f5f4; --stone-200:#e7e5e4; --stone-400:#a8a29e; --stone-600:#57534e; --stone-800:#292524; --stone-900:#1c1917; --red:#991b1b; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:Arial,sans-serif; background:var(--stone-100); color:var(--stone-800); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:2rem 1rem; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--stone-100);
-      color: var(--stone-800);
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 2rem 1rem;
-    }
+    .toolbar { width:100%; max-width:820px; display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; }
+    .toolbar .estado { font-size:.75rem; color:var(--stone-600); }
+    .toolbar .estado.ok { color:#166534; }
+    .toolbar .estado.err { color:var(--red); }
+    .btn { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:.5rem 1.2rem; border:none; border-radius:3px; cursor:pointer; transition:opacity .15s; }
+    .btn:hover { opacity:.85; }
+    .btn-sec   { background:var(--stone-400); color:white; }
+    .btn-print { background:var(--stone-800); color:white; }
+    .btn-group { display:flex; gap:.5rem; }
 
-    /* ── App header ── */
-    .app-header {
-      width: 100%; max-width: 820px;
-      display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 1.5rem; padding-bottom: 1rem;
-      border-bottom: 2px solid var(--rn-blue);
-    }
-    .app-header h1 {
-      font-size: .9rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .05em;
-      color: var(--rn-blue); line-height: 1.4;
-    }
-    .app-header p { font-size: .72rem; color: var(--stone-600); }
+    /* RECIBO */
+    #recibo { width:100%; max-width:820px; background:white; border:1px solid var(--stone-200); }
 
-    /* ── Búsqueda ── */
-    .search-card {
-      width: 100%; max-width: 820px;
-      background: white; border: 1px solid var(--stone-200);
-      border-radius: 4px; padding: 1.25rem 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap;
-    }
-    .search-card label {
-      font-size: .72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .05em;
-      color: var(--stone-600); display: block; margin-bottom: .3rem;
-    }
-    .search-card input {
-      font-family: 'Courier New', monospace; font-size: .95rem;
-      border: 1.5px solid var(--stone-200); border-radius: 3px;
-      padding: .5rem .75rem; width: 230px;
-      color: var(--stone-800); background: var(--stone-50);
-      letter-spacing: .06em; text-transform: uppercase;
-    }
-    .search-card input:focus { outline: none; border-color: var(--rn-blue); }
-    .btn {
-      font-size: .8rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .05em; padding: .55rem 1.3rem;
-      border: none; border-radius: 3px; cursor: pointer; transition: opacity .15s;
-    }
-    .btn:hover { opacity: .85; }
-    .btn-primary { background: var(--rn-blue); color: white; }
-    .btn-print   { background: var(--stone-800); color: white; }
-    .msg-error {
-      font-size: .78rem; color: var(--red);
-      margin-top: .35rem; display: none; width: 100%;
-    }
-    .spinner {
-      font-size: .78rem; color: var(--stone-600);
-      margin-top: .35rem; display: none; width: 100%;
-    }
+    .rec-inst { display:flex; align-items:stretch; border-bottom:2px solid var(--stone-200); }
+    .logo-col { padding:1rem 1.2rem; border-right:2px solid var(--stone-200); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.25rem; min-width:130px; }
+    .logo-col .escudo { font-size:2rem; }
+    .logo-col .org-lbl { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--rn-blue); text-align:center; line-height:1.3; }
+    .logo-col .sub-lbl { font-size:.55rem; color:var(--stone-600); text-align:center; line-height:1.3; }
+    .title-col { flex:1; padding:1rem 1.5rem; display:flex; flex-direction:column; justify-content:center; }
+    .title-col .sec-name { font-size:1.05rem; font-weight:400; color:var(--stone-800); }
+    .title-col .prov-name { font-size:1.6rem; font-weight:700; color:var(--stone-900); line-height:1.1; }
 
-    /* ── Acciones ── */
-    .actions {
-      width: 100%; max-width: 820px;
-      display: none; justify-content: flex-end;
-      gap: .75rem; margin-bottom: .75rem;
-    }
+    .rec-body { padding:1.4rem 2rem; }
+    .rec-doc-title { font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; border-bottom:1.5px solid var(--stone-800); padding-bottom:.3rem; margin-bottom:1.1rem; display:flex; justify-content:space-between; align-items:baseline; }
+    .rec-doc-title .lugar-fecha { font-size:.82rem; font-weight:400; text-transform:none; color:var(--stone-600); }
 
-    /* ══ RECIBO ══ */
-    #recibo {
-      width: 100%; max-width: 820px;
-      background: white; border: 1px solid var(--stone-200);
-      display: none; font-family: Arial, sans-serif;
-    }
+    .rec-cols { display:flex; gap:2.5rem; }
+    .rec-left { flex:1; }
+    .rec-right { min-width:235px; display:flex; flex-direction:column; gap:.6rem; }
 
-    /* Encabezado institucional */
-    .rec-inst {
-      display: flex; align-items: stretch;
-      border-bottom: 2px solid var(--stone-200);
-    }
-    .logo-col {
-      padding: 1rem 1.2rem; border-right: 2px solid var(--stone-200);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: .25rem; min-width: 130px;
-    }
-    .logo-col .escudo { font-size: 2rem; }
-    .logo-col .org-lbl {
-      font-size: .58rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .04em; color: var(--rn-blue);
-      text-align: center; line-height: 1.3;
-    }
-    .logo-col .sub-lbl {
-      font-size: .55rem; color: var(--stone-600);
-      text-align: center; line-height: 1.3;
-    }
-    .title-col {
-      flex: 1; padding: 1rem 1.5rem;
-      display: flex; flex-direction: column; justify-content: center;
-    }
-    .title-col .sec-name {
-      font-size: 1.05rem; font-weight: 400; color: var(--stone-800);
-    }
-    .title-col .prov-name {
-      font-size: 1.6rem; font-weight: 700; color: var(--stone-900); line-height: 1.1;
-    }
+    /* Filas de campo */
+    .campo-row { display:flex; align-items:baseline; gap:.35rem; margin-bottom:.5rem; font-size:.88rem; }
+    .campo-row .key { font-weight:700; white-space:nowrap; color:var(--stone-800); min-width:95px; }
 
-    /* Cuerpo */
-    .rec-body { padding: 1.4rem 2rem; }
+    /* Inputs y selects dentro del recibo — sin borde visible, solo línea inferior */
+    .campo-row input,
+    .campo-row select {
+      border:none; border-bottom:1px solid var(--stone-400);
+      flex:1; color:var(--stone-900); padding-bottom:1px;
+      font-size:.88rem; font-family:Arial,sans-serif;
+      background:transparent; outline:none; width:100%;
+    }
+    .campo-row input.mono { font-family:'Courier New',monospace; font-size:.84rem; }
+    .campo-row input:focus,
+    .campo-row select:focus { border-bottom-color:var(--rn-blue); }
 
-    .rec-doc-title {
-      font-size: 1rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .06em;
-      border-bottom: 1.5px solid var(--stone-800);
-      padding-bottom: .3rem; margin-bottom: 1.1rem;
-      display: flex; justify-content: space-between; align-items: baseline;
-    }
-    .rec-doc-title .lugar-fecha {
-      font-size: .82rem; font-weight: 400;
-      text-transform: none; letter-spacing: 0; color: var(--stone-600);
-    }
+    /* Select especial para expediente */
+    #sel-exp { font-family:'Courier New',monospace; font-size:.84rem; color:var(--stone-900); }
 
-    /* Dos columnas */
-    .rec-cols { display: flex; gap: 2.5rem; }
-    .rec-left { flex: 1; }
-    .rec-right {
-      min-width: 235px;
-      display: flex; flex-direction: column; gap: .6rem;
-    }
+    .importe-row { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; font-size:.88rem; }
+    .importe-row .key { color:var(--stone-800); white-space:nowrap; }
+    .importe-row input { font-family:'Courier New',monospace; text-align:right; border:none; border-bottom:1px solid var(--stone-400); min-width:115px; padding-bottom:1px; color:var(--stone-900); font-size:.9rem; background:transparent; outline:none; }
+    .importe-row input:focus { border-bottom-color:var(--rn-blue); }
 
-    /* Fila campo */
-    .campo-row {
-      display: flex; align-items: baseline;
-      gap: .35rem; margin-bottom: .45rem; font-size: .88rem;
-    }
-    .campo-row .key { font-weight: 700; white-space: nowrap; color: var(--stone-800); }
-    .campo-row .val {
-      border-bottom: 1px solid var(--stone-400);
-      flex: 1; min-width: 50px; color: var(--stone-900); padding-bottom: 1px;
-    }
-    .campo-row .val.mono {
-      font-family: 'Courier New', monospace; font-size: .84rem;
-    }
+    .total-row { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; font-size:.95rem; font-weight:700; border-top:1.5px solid var(--stone-800); padding-top:.4rem; margin-top:.2rem; }
+    .total-row .val { font-family:'Courier New',monospace; text-align:right; min-width:115px; color:var(--stone-900); }
 
-    /* Importes */
-    .importe-row {
-      display: flex; justify-content: space-between;
-      align-items: baseline; gap: 1rem; font-size: .88rem;
-    }
-    .importe-row .key { color: var(--stone-800); white-space: nowrap; }
-    .importe-row .val {
-      font-family: 'Courier New', monospace; text-align: right;
-      border-bottom: 1px solid var(--stone-400);
-      min-width: 115px; padding-bottom: 1px; color: var(--stone-900);
-    }
-    .total-row {
-      display: flex; justify-content: space-between;
-      align-items: baseline; gap: 1rem;
-      font-size: .95rem; font-weight: 700;
-      border-top: 1.5px solid var(--stone-800); padding-top: .4rem;
-    }
-    .total-row .val {
-      font-family: 'Courier New', monospace;
-      text-align: right; min-width: 115px; color: var(--stone-900);
-    }
+    .rec-sep { border:none; border-top:1px solid var(--stone-200); margin:.8rem 0; }
 
-    .rec-sep { border: none; border-top: 1px solid var(--stone-200); margin: .8rem 0; }
+    .rec-firma { display:flex; justify-content:flex-end; padding:.6rem 0 .2rem; }
+    .firma-box { text-align:center; width:210px; }
+    .firma-espacio { height:48px; }
+    .firma-linea { border-top:1px solid var(--stone-600); margin-bottom:.25rem; }
+    .firma-nombre { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--stone-800); }
+    .firma-cargo { font-size:.64rem; color:var(--stone-600); text-transform:uppercase; letter-spacing:.02em; line-height:1.5; }
 
-    /* Firma */
-    .rec-firma { display: flex; justify-content: flex-end; padding: .6rem 0 .2rem; }
-    .firma-box { text-align: center; width: 210px; }
-    .firma-espacio { height: 48px; }
-    .firma-linea { border-top: 1px solid var(--stone-600); margin-bottom: .25rem; }
-    .firma-nombre {
-      font-size: .72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .03em; color: var(--stone-800);
-    }
-    .firma-cargo {
-      font-size: .64rem; color: var(--stone-600);
-      text-transform: uppercase; letter-spacing: .02em; line-height: 1.5;
-    }
+    .rec-aviso { border:1px solid var(--stone-400); padding:.6rem .9rem; font-size:.72rem; color:var(--stone-700); line-height:1.5; margin-top:.9rem; background:var(--stone-50); }
 
-    /* Aviso bancario */
-    .rec-aviso {
-      border: 1px solid var(--stone-400); padding: .6rem .9rem;
-      font-size: .72rem; color: var(--stone-700);
-      line-height: 1.5; margin-top: .9rem; background: var(--stone-50);
-    }
+    .loading-overlay { font-size:.78rem; color:var(--stone-600); text-align:center; padding:.5rem; display:none; }
 
-    /* ── PRINT ── */
     @media print {
-      body { background: white; padding: 0; }
-      .app-header, .search-card, .actions { display: none !important; }
-      #recibo { display: block !important; border: 1px solid #999; max-width: 100%; }
+      body { background:white; padding:0; }
+      .toolbar { display:none !important; }
+      #recibo { border:1px solid #999; max-width:100%; }
+      input, select { border-bottom:none !important; -webkit-appearance:none; appearance:none; }
     }
   </style>
 </head>
 <body>
 
-<header class="app-header">
-  <div style="font-size:2rem">⛏️</div>
-  <div>
-    <h1>Sistema de Liquidación de Canon Minero</h1>
-    <p>Secretaría de Minería · Provincia de Río Negro</p>
+<!-- Barra superior -->
+<div class="toolbar">
+  <span class="estado" id="estado">&#8987; Cargando expedientes...</span>
+  <div class="btn-group">
+    <button class="btn btn-sec"   onclick="limpiar()">Limpiar</button>
+    <button class="btn btn-print" onclick="imprimir()">&#128424; Imprimir</button>
   </div>
-</header>
-
-<div class="search-card">
-  <div>
-    <label for="nro-exp">Número de Expediente</label>
-    <input id="nro-exp" type="text" placeholder="Ej: 152443M1967" maxlength="24"/>
-    <p class="msg-error" id="msg-error">Expediente no encontrado o sin canon registrado.</p>
-    <p class="spinner"   id="spinner">⏳ Consultando base de datos…</p>
-  </div>
-  <button class="btn btn-primary" onclick="buscar()">Buscar</button>
-</div>
-
-<div class="actions" id="actions-bar">
-  <button class="btn btn-print" onclick="window.print()">🖨 Imprimir</button>
 </div>
 
 <!-- RECIBO -->
 <div id="recibo">
   <div class="rec-inst">
     <div class="logo-col">
-      <div class="escudo">🏛️</div>
-      <div class="org-lbl">Gobierno<br>de Río Negro</div>
-      <div class="sub-lbl">Secretaría de Estado<br>de Energía<br>Secretaría de Minería</div>
+      <div class="escudo">&#127963;</div>
+      <div class="org-lbl">Gobierno<br>de R&iacute;o Negro</div>
+      <div class="sub-lbl">Secretar&iacute;a de Estado<br>de Energ&iacute;a<br>Secretar&iacute;a de Miner&iacute;a</div>
     </div>
     <div class="title-col">
-      <div class="sec-name">Secretaría de de Minería</div>
-      <div class="prov-name">Provincia de Río Negro</div>
+      <div class="sec-name">Secretar&iacute;a de Miner&iacute;a</div>
+      <div class="prov-name">Provincia de R&iacute;o Negro</div>
     </div>
   </div>
 
   <div class="rec-body">
     <div class="rec-doc-title">
       <span>Liquidacion Canon</span>
-      <span class="lugar-fecha">Viedma, <span id="r-fecha">—</span></span>
+      <span class="lugar-fecha">Viedma, <input type="text" id="r-fecha" style="width:110px;font-size:.82rem;color:var(--stone-600);"/></span>
     </div>
 
     <div class="rec-cols">
-      <!-- Izquierda -->
+      <!-- Columna izquierda -->
       <div class="rec-left">
+
         <div class="campo-row">
           <span class="key">Expediente:</span>
-          <span class="val mono" id="r-expediente">—</span>
+          <select id="sel-exp" onchange="cargarExpediente()">
+            <option value="">Cargando...</option>
+          </select>
         </div>
+
         <div class="campo-row">
           <span class="key">Propietario:</span>
-          <span class="val" id="r-propietario">—</span>
+          <input type="text" id="r-propietario"/>
         </div>
         <div class="campo-row">
           <span class="key">Yacimiento:</span>
-          <span class="val" id="r-yacimiento">—</span>
+          <input type="text" id="r-yacimiento"/>
         </div>
         <hr class="rec-sep"/>
         <div class="campo-row">
           <span class="key">Mineral:</span>
-          <span class="val" id="r-mineral">—</span>
+          <input type="text" id="r-mineral"/>
         </div>
         <div class="campo-row">
-          <span class="key">Categoría:</span>
-          <span class="val" id="r-categoria">—</span>
+          <span class="key">Categor&iacute;a:</span>
+          <input type="text" id="r-categoria"/>
         </div>
         <div class="campo-row">
           <span class="key">Pertenencias:</span>
-          <span class="val" id="r-pertenencias"></span>
+          <input type="text" id="r-pertenencias"/>
         </div>
         <hr class="rec-sep"/>
         <div class="campo-row">
           <span class="key" style="visibility:hidden">x</span>
-          <span class="val" id="r-anio-cuota">—</span>
+          <input type="text" id="r-anio-cuota" placeholder="A&ntilde;o: 2026, Cuota: 1"/>
         </div>
+
       </div>
 
-      <!-- Derecha -->
+      <!-- Columna derecha -->
       <div class="rec-right">
         <div class="importe-row">
           <span class="key">Importe Canon ($)</span>
-          <span class="val" id="r-importe">—</span>
+          <input type="text" id="r-importe" placeholder="0,00" oninput="calcTotal()"/>
         </div>
         <div class="importe-row">
           <span class="key">Recargo por Caducidad ($)</span>
-          <span class="val" id="r-recargo">,00.-</span>
+          <input type="text" id="r-recargo" value=",00.-" oninput="calcTotal()"/>
         </div>
         <div class="total-row">
           <span class="key">Total a Pagar ($)</span>
-          <span class="val" id="r-total">—</span>
+          <span class="val" id="r-total">&mdash;</span>
         </div>
-
         <div class="rec-firma">
           <div class="firma-box">
             <div class="firma-espacio"></div>
             <div class="firma-linea"></div>
-            <div class="firma-nombre">Lic. María Laura Yang</div>
-            <div class="firma-cargo">Policía Minera<br>Secretaría de Minería<br>Provincia de Río Negro</div>
+            <div class="firma-nombre">Lic. Mar&iacute;a Laura Yang</div>
+            <div class="firma-cargo">Polic&iacute;a Minera<br>Secretar&iacute;a de Miner&iacute;a<br>Provincia de R&iacute;o Negro</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="rec-aviso">
-      El importe del canon deberá hacerse efectivo mediante giro, cheque o transferencia a la cuenta corriente
-      "Tesorería General. Fondo Recaudador ITMAS", Nº900001199 del Banco Patagonia, Casa Central
+      El importe del canon deber&aacute; hacerse efectivo mediante giro, cheque o transferencia a la cuenta corriente
+      &ldquo;Tesorer&iacute;a General. Fondo Recaudador ITMAS&rdquo;, N&ordm;900001199 del Banco Patagonia, Casa Central
     </div>
   </div>
 </div>
 
 <script>
-  const EP_CATASTRO = "https://script.google.com/macros/s/AKfycbxCYT-vjMO9u3ptHMwWRiHClUev9UtoxvtyvUXt7ydvSAfeW6D2kz2kHwxl7lrIRh0/exec";
-  const EP_CANON    = "https://script.google.com/macros/s/AKfycbw0aEIRf9uyqoKCA3zsjkuuLkbkc6Ovbxf0Qgi3m2YkrV9PQ2GohowQ8f1eiyECKAJg/exec";
+  var EP = "https://script.google.com/macros/s/AKfycbxCYT-vjMO9u3ptHMwWRiHClUev9UtoxvtyvUXt7ydvSAfeW6D2kz2kHwxl7lrIRh0/exec";
+  var DB = [];
 
-  function fmtPeso(n) {
-    if (!n && n !== 0) return ",00.-";
-    return n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ".-";
+  // Fecha hoy
+  document.getElementById("r-fecha").value = new Date().toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"});
+
+  function setEstado(msg, cls) {
+    var el = document.getElementById("estado");
+    el.textContent = msg;
+    el.className = "estado" + (cls ? " " + cls : "");
   }
 
-  function fechaHoy() {
-    return new Date().toLocaleDateString("es-AR", { day:"2-digit", month:"2-digit", year:"numeric" });
-  }
-
-  function show(id, val) {
-    document.getElementById(id).textContent = (val !== null && val !== undefined && val !== "") ? val : "—";
-  }
-
-  function setError(msg) {
-    const el = document.getElementById("msg-error");
-    el.textContent = msg || "Expediente no encontrado o sin canon registrado.";
-    el.style.display = "block";
-  }
-
-  function canonMasReciente(arr) {
-    const pagados = arr.filter(r => {
-      const p = String(r["PAGADA"] || "").toUpperCase().trim();
-      return p === "S" || p === "SI" || p === "SÍ" || p === "TRUE" || p === "1";
-    });
-    if (!pagados.length) return null;
-    pagados.sort((a, b) => {
-      const da = Number(b["ANO"]) - Number(a["ANO"]);
-      return da !== 0 ? da : Number(b["CUOTA"]) - Number(a["CUOTA"]);
-    });
-    return pagados[0];
-  }
-
-  function toArray(res) {
-    if (Array.isArray(res)) return res;
-    if (res && Array.isArray(res.data)) return res.data;
-    if (res && typeof res === "object") return [res];
-    return [];
-  }
-
-  function parseImporte(val) {
-    if (typeof val === "number") return val;
-    const s = String(val).replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+  function parseNum(v) {
+    var s = String(v).replace(/\s/g,"").replace(/\./g,"").replace(",",".");
     return parseFloat(s) || 0;
   }
 
-  // Proxy para evitar bloqueo CORS de GitHub Pages → Google Apps Script
-  async function fetchViaProxy(url) {
-    const proxy = "https://corsproxy.io/?" + encodeURIComponent(url);
-    const res   = await fetch(proxy);
-    return await res.json();
+  function calcTotal() {
+    var t = parseNum(document.getElementById("r-importe").value) +
+            parseNum(document.getElementById("r-recargo").value);
+    document.getElementById("r-total").textContent = t > 0
+      ? t.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}) + ".-"
+      : "\u2014";
   }
 
-  async function buscar() {
-    const nro = document.getElementById("nro-exp").value.trim().toUpperCase();
-    document.getElementById("msg-error").style.display   = "none";
-    document.getElementById("recibo").style.display      = "none";
-    document.getElementById("actions-bar").style.display = "none";
-    document.getElementById("spinner").style.display     = "none";
+  // Carga via JSONP
+  function cargarCatastro() {
+    var cb = "cbCatInit";
+    var timer = setTimeout(function(){
+      delete window[cb];
+      setEstado("Tiempo de espera agotado. Recarg\u00e1 la p\u00e1gina.", "err");
+      document.getElementById("sel-exp").innerHTML = "<option value=''>Error de conexi\u00f3n</option>";
+    }, 25000);
 
-    if (!nro) { setError("Ingresá un número de expediente."); return; }
+    window[cb] = function(res) {
+      clearTimeout(timer);
+      delete window[cb];
+      DB = (res.datos || []).sort(function(a,b){
+        return String(a["N\u00b0 EXPEDIENTE"]).localeCompare(String(b["N\u00b0 EXPEDIENTE"]));
+      });
+      var sel = document.getElementById("sel-exp");
+      sel.innerHTML = "<option value=''>— Seleccion\u00e1 un expediente —</option>";
+      DB.forEach(function(r, i){
+        var opt = document.createElement("option");
+        opt.value = i;
+        var nro = r["N\u00b0 EXPEDIENTE"] || "";
+        var nom = r["NOMBRE DEL DERECHO"] || "";
+        opt.textContent = nro + (nom ? "  \u2014  " + nom : "");
+        sel.appendChild(opt);
+      });
+      setEstado(DB.length + " expedientes cargados \u2713", "ok");
+    };
 
-    document.getElementById("spinner").style.display = "block";
-
-    try {
-      const resCat = await fetchViaProxy(EP_CATASTRO);
-
-      document.getElementById("spinner").style.display = "none";
-
-      // Catastro
-      const catArr = toArray(resCat.datos || resCat);
-      const cat = catArr.find(r =>
-        String(r["N° EXPEDIENTE"] || r["N° EXPEDIENTE"] || "").trim().toUpperCase() === nro
-      );
-      if (!cat) { setError("Expediente no encontrado en el catastro."); return; }
-
-      // Pintar — Canon en blanco por ahora
-      show("r-fecha",       fechaHoy());
-      show("r-expediente",  nro);
-      show("r-propietario", cat["Nombre / Razón Social   (TITULAR DEL DERECHO MINERO)_U"] || cat["TITULAR"] || "");
-      show("r-yacimiento",  cat["NOMBRE DEL DERECHO"] || "");
-      show("r-mineral",     cat["MINERAL / SUSTANCIA"] || "");
-      show("r-categoria",   cat["CATEGOÍA SEGÚN MATHI"] || cat["CATEGORÍA SEGÚN MATHI"] || "");
-      show("r-pertenencias", "");
-      show("r-anio-cuota",  "");
-      show("r-importe",     "");
-      show("r-recargo",     ",00.-");
-      show("r-total",       "");
-
-      document.getElementById("recibo").style.display      = "block";
-      document.getElementById("actions-bar").style.display = "flex";
-      document.getElementById("recibo").scrollIntoView({ behavior: "smooth", block: "start" });
-
-    } catch(e) {
-      document.getElementById("spinner").style.display = "none";
-      setError("Error al consultar los servicios. Verificá la conexión e intentá de nuevo.");
-      console.error(e);
-    }
+    var sc = document.createElement("script");
+    sc.src = EP + "?callback=" + cb;
+    sc.onerror = function(){
+      clearTimeout(timer);
+      delete window[cb];
+      setEstado("No se pudo conectar con la base de datos.", "err");
+      document.getElementById("sel-exp").innerHTML = "<option value=''>Error de conexi\u00f3n</option>";
+    };
+    document.head.appendChild(sc);
   }
 
-  document.getElementById("nro-exp").addEventListener("keydown", e => {
-    if (e.key === "Enter") buscar();
-  });
+  function cargarExpediente() {
+    var idx = document.getElementById("sel-exp").value;
+    if (idx === "") return;
+    var r = DB[parseInt(idx)];
+    if (!r) return;
+    document.getElementById("r-propietario").value = r["Nombre / Raz\u00f3n Social   (TITULAR DEL DERECHO MINERO)_U"] || "";
+    document.getElementById("r-yacimiento").value  = r["NOMBRE DEL DERECHO"] || "";
+    document.getElementById("r-mineral").value     = r["MINERAL / SUSTANCIA"] || "";
+    document.getElementById("r-categoria").value   = r["CATEGO\u00cdA SEG\u00daN MATHI"] || r["CATEGOR\u00cdA SEG\u00daN MATHI"] || "";
+    document.getElementById("r-pertenencias").value = "";
+    document.getElementById("r-anio-cuota").value   = "";
+    document.getElementById("r-importe").value      = "";
+    document.getElementById("r-recargo").value      = ",00.-";
+    document.getElementById("r-total").textContent  = "\u2014";
+  }
+
+  function limpiar() {
+    document.getElementById("sel-exp").value = "";
+    ["r-propietario","r-yacimiento","r-mineral","r-categoria","r-pertenencias","r-anio-cuota","r-importe"].forEach(function(id){
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("r-recargo").value = ",00.-";
+    document.getElementById("r-total").textContent = "\u2014";
+  }
+
+  function imprimir() {
+    var inputs = document.querySelectorAll("#recibo input, #recibo select");
+    var backup = [];
+    inputs.forEach(function(el){
+      var sp = document.createElement("span");
+      sp.textContent = el.tagName === "SELECT"
+        ? (el.options[el.selectedIndex] ? el.options[el.selectedIndex].text.split("\u2014")[0].trim() : "")
+        : el.value;
+      el.parentNode.insertBefore(sp, el);
+      el.style.display = "none";
+      backup.push({sp:sp, el:el});
+    });
+    window.print();
+    backup.forEach(function(o){ o.el.style.display=""; o.sp.remove(); });
+  }
+
+  cargarCatastro();
 </script>
 </body>
 </html>
