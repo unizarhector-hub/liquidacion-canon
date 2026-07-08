@@ -378,10 +378,9 @@
 
   // Proxy para evitar bloqueo CORS de GitHub Pages → Google Apps Script
   async function fetchViaProxy(url) {
-    const proxy = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
+    const proxy = "https://corsproxy.io/?" + encodeURIComponent(url);
     const res   = await fetch(proxy);
-    const json  = await res.json();
-    return JSON.parse(json.contents);
+    return await res.json();
   }
 
   async function buscar() {
