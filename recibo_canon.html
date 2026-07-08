@@ -133,7 +133,7 @@
         <hr class="rec-sep"/>
         <div class="campo-row">
           <span class="key" style="visibility:hidden">x</span>
-          <input type="text" id="r-anio-cuota" placeholder="A&ntilde;o: 2026, Cuota: 1"/>
+          <span style="display:flex;gap:.75rem;align-items:baseline;flex:1;"><span style="font-size:.88rem;">A&ntilde;o:</span><select id="r-ano" style="border:none;border-bottom:1px solid #a8a29e;font-size:.88rem;font-family:Arial,sans-serif;background:transparent;outline:none;color:#1c1917;padding-bottom:1px;"><option value=""></option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option></select><span style="font-size:.88rem;margin-left:.5rem;">Cuota:</span><select id="r-cuota" style="border:none;border-bottom:1px solid #a8a29e;font-size:.88rem;font-family:Arial,sans-serif;background:transparent;outline:none;color:#1c1917;padding-bottom:1px;"><option value=""></option><option>1</option><option>2</option></select></span>
         </div>
       </div>
 
@@ -185,10 +185,12 @@
   }
 
   function limpiar() {
-    ["r-expediente","r-propietario","r-yacimiento","r-mineral","r-categoria","r-pertenencias","r-anio-cuota","r-importe"].forEach(function(id){
+    ["r-expediente","r-propietario","r-yacimiento","r-mineral","r-categoria","r-pertenencias","r-importe"].forEach(function(id){
       document.getElementById(id).value = "";
     });
     document.getElementById("r-recargo").value = ",00.-";
+    document.getElementById("r-ano").value = "2026";
+    document.getElementById("r-cuota").value = "";
     document.getElementById("r-total").textContent = "\u2014";
   }
 
