@@ -396,32 +396,18 @@
     document.getElementById("spinner").style.display = "block";
 
     try {
-      const [resCat, resCan] = await Promise.all([
-        fetchViaProxy(EP_CATASTRO),
-        fetchViaProxy(EP_CANON + "?numexp=" + encodeURIComponent(nro)),
-      ]);
+      const resCat = await fetchViaProxy(EP_CATASTRO);
 
       document.getElementById("spinner").style.display = "none";
 
       // Catastro
       const catArr = toArray(resCat.datos || resCat);
       const cat = catArr.find(r =>
-        String(r["N\u00b0 EXPEDIENTE"] || r["N° EXPEDIENTE"] || "").trim().toUpperCase() === nro
+        String(r["N° EXPEDIENTE"] || r["N° EXPEDIENTE"] || "").trim().toUpperCase() === nro
       );
       if (!cat) { setError("Expediente no encontrado en el catastro."); return; }
 
-      // Canon
-      const canArr = toArray(resCan.datos || resCan);
-      const canExp = canArr.filter(r => String(r["NumExp"] || "").trim().toUpperCase() === nro);
-      const canon  = canonMasReciente(canExp.length ? canExp : canArr);
-      if (!canon) { setError("No hay pagos registrados para este expediente."); return; }
-
-      // Cálculo
-      const importe = parseImporte(canon["IMPORTE"]);
-      const recargo = 0;
-      const total   = importe + recargo;
-
-      // Pintar
+      // Pintar — Canon en blanco por ahora
       show("r-fecha",       fechaHoy());
       show("r-expediente",  nro);
       show("r-propietario", cat["Nombre / Razón Social   (TITULAR DEL DERECHO MINERO)_U"] || cat["TITULAR"] || "");
@@ -429,10 +415,10 @@
       show("r-mineral",     cat["MINERAL / SUSTANCIA"] || "");
       show("r-categoria",   cat["CATEGOÍA SEGÚN MATHI"] || cat["CATEGORÍA SEGÚN MATHI"] || "");
       show("r-pertenencias", "");
-      show("r-anio-cuota",  "Año: " + canon["ANO"] + ", Cuota: " + canon["CUOTA"]);
-      show("r-importe",     fmtPeso(importe));
-      show("r-recargo",     fmtPeso(recargo));
-      show("r-total",       fmtPeso(total));
+      show("r-anio-cuota",  "");
+      show("r-importe",     "");
+      show("r-recargo",     ",00.-");
+      show("r-total",       "");
 
       document.getElementById("recibo").style.display      = "block";
       document.getElementById("actions-bar").style.display = "flex";
